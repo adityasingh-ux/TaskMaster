@@ -115,36 +115,51 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
 <div class="dashboard-container">
     <h2>📋 All Tasks</h2>
     <table class="table" id="myTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Assigned To</th>
-                <th>Due Date</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php
-        $sql = "SELECT * FROM tasks";
-        $result = mysqli_query($conn, $sql);
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>File</th> <!-- Added File column -->
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+    $sql = "SELECT * FROM tasks";
+    $result = mysqli_query($conn, $sql);
 
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr>
-                <td>" . htmlspecialchars($row['id']) . "</td>
-                <td>" . htmlspecialchars($row['title']) . "</td>
-                <td>" . htmlspecialchars($row['description']) . "</td>
-                <td>" . htmlspecialchars($row['assigned_to']) . "</td>
-                <td>" . htmlspecialchars($row['due_date']) . "</td>
-                <td>" . htmlspecialchars($row['status']) . "</td>
-                <td>
-                    <a href='edit_task.php?id=" . urlencode($row['id']) . "' class='btn btn-edit btn-sm'>Edit</a>
-                    <a href='delete_task.php?id=" . urlencode($row['id']) . "' class='btn btn-delete btn-sm' onclick=\"return confirm('Are you sure you want to delete this task?');\">Delete</a>
-                </td>
-            </tr>";
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo "<tr>
+            <td>" . htmlspecialchars($row['id']) . "</td>
+            <td>" . htmlspecialchars($row['title']) . "</td>
+            <td>" . htmlspecialchars($row['description']) . "</td>
+            <td>" . htmlspecialchars($row['assigned_to']) . "</td>
+            <td>" . htmlspecialchars($row['due_date']) . "</td>
+            <td>" . htmlspecialchars($row['status']) . "</td>";
+
+        // File column
+        echo "<td>";
+        if (!empty($row['file_path'])) {
+            $fileName = basename($row['file_path']);
+            $fileUrl = "/loginsystem/tasks/uploads/" . $fileName;
+            echo "<a href='$fileUrl' class='btn btn-primary btn-sm' download>Download</a>";
+        } else {
+            echo "<span class='text-muted'>No file</span>";
         }
+        echo "</td>";
+
+        // Action column
+        echo "<td>
+                <a href='edit_task.php?id=" . urlencode($row['id']) . "' class='btn btn-edit btn-sm'>Edit</a>
+                <a href='delete_task.php?id=" . urlencode($row['id']) . "' class='btn btn-delete btn-sm' onclick=\"return confirm('Are you sure you want to delete this task?');\">Delete</a>
+            </td>
+        </tr>";
+    }
+        
         ?>
         </tbody>
     </table>

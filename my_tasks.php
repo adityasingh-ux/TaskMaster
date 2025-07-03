@@ -115,6 +115,7 @@ mysqli_stmt_close($stmt);
                 <th>Description</th>
                 <th>Status</th>
                 <th>Due Date</th>
+                <th>File</th> <!-- Added File column -->
             </tr>
         </thead>
         <tbody>
@@ -132,13 +133,24 @@ mysqli_stmt_close($stmt);
                         </select>
                     </td>
                     <td><?= htmlspecialchars($task['due_date']) ?></td>
+                    <td>
+                        <?php
+                        if (!empty($task['file_path'])) {
+                            $fileName = basename($task['file_path']);
+                            $fileUrl = "/loginsystem/tasks/uploads/" . $fileName;
+                            echo "<a href='$fileUrl' class='btn btn-primary btn-sm' download>Download</a>";
+                        } else {
+                            echo "<span class='text-muted'>No file</span>";
+                        }
+                        ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="5" class="text-center">No tasks found.</td></tr>
+            <tr><td colspan="6" class="text-center">No tasks found.</td></tr>
         <?php endif; ?>
         </tbody>
-    </table>
+</table>
 </div>
 <script>
 document.querySelectorAll('.status-dropdown').forEach(function(dropdown) {

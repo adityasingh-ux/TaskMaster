@@ -23,22 +23,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $description = $_POST["description"];
   $due_date = $_POST["due_date"];
 
-  // Fetch all roll numbers from users table
+
+  $file_path = '';
+  if (isset($_FILES['task_file']) && $_FILES['task_file']['error'] === UPLOAD_ERR_OK) {
+      $fileTmpPath = $_FILES['task_file']['tmp_name'];
+      $fileName = $_FILES['task_file']['name'];
+      $fileNameCmps = explode(".", $fileName);
+      $fileExtension = strtolower(end($fileNameCmps));
+      $allowedfileExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif'];
+
+      if (in_array($fileExtension, $allowedfileExtensions)) {
+          $uploadFileDir = 'uploads/';
+          if (!is_dir($uploadFileDir)) {
+              mkdir($uploadFileDir, 0777, true);
+          }
+          $newFileName = uniqid() . '.' . $fileExtension;
+          $dest_path = $uploadFileDir . $newFileName;
+
+          if(move_uploaded_file($fileTmpPath, $dest_path)) {
+              $file_path = $dest_path;
+          } else {
+              echo "Error moving the uploaded file.<br>";
+          }
+      } else {
+          echo "Upload failed. Allowed types: " . implode(',', $allowedfileExtensions) . "<br>";
+      }
+  } else {
+      echo "No file uploaded or upload error: " . $_FILES['task_file']['error'] . "<br>";
+  }
+
+
   $user_query = "SELECT rollno FROM users";
   $user_result = mysqli_query($conn, $user_query);
 
   if ($user_result && mysqli_num_rows($user_result) > 0) {
     while ($row = mysqli_fetch_assoc($user_result)) {
       $rollno = $row['rollno'];
-      // Insert a task for each rollno
-      $sql = "INSERT INTO `tasks` (`title`, `description`, `assigned_to`, `due_date`) 
-              VALUES ('$title', '$description', '$rollno', '$due_date')";
+
+      $sql = "INSERT INTO `tasks` (`title`, `description`, `assigned_to`, `due_date`, `file_path`) 
+              VALUES ('$title', '$description', '$rollno', '$due_date', '$file_path')";
       $result = mysqli_query($conn, $sql);
       if (!$result) {
         echo "The record was not inserted for rollno $rollno: " . mysqli_error($conn) . "<br>";
       }
     }
-    echo "Task assigned to all users!";
+    // echo "Task assigned to all users!";
   } else {
     echo "No users found to assign the task.";
   }
@@ -154,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   <div class="task-form-container">
     <h2>Add New Task</h2>
-    <form action="create_task2.php" method="post">
+    <form action="create_task2.php" method="post" enctype="multipart/form-data">
       <label for="title">Task Title</label>
       <input type="text" id="title" name="title" placeholder="e.g. Submit Assignment" required>
 
@@ -163,6 +192,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       <label for="due_date">Due Date</label>
       <input type="date" id="due_date" name="due_date">
+      <label for="task_file">Attach File (PDF, Image):</label>
+      <input type="file" id="task_file" name="task_file" accept=".pdf,.jpg,.jpeg,.png,.gif">
       <button type="submit">Add Task</button>
     </form>
   </div>
