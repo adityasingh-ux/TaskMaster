@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 01, 2025 at 09:04 PM
+-- Generation Time: Jul 05, 2025 at 10:33 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -75,22 +75,39 @@ CREATE TABLE `tasks` (
   `assigned_to` int(11) DEFAULT NULL,
   `due_date` date DEFAULT NULL,
   `status` enum('pending','in_progress','completed') DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `file_path` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tasks`
 --
 
-INSERT INTO `tasks` (`id`, `title`, `description`, `assigned_to`, `due_date`, `status`, `created_at`) VALUES
-(1, 'Web Development', 'Complete the website in a week.', 1001, '2025-07-09', 'pending', '2025-07-01 18:55:49'),
-(2, 'Web Development', 'Complete the website in a week.', 1002, '2025-07-09', 'pending', '2025-07-01 18:55:49'),
-(3, 'Web Development', 'Complete the website in a week.', 1003, '2025-07-09', 'pending', '2025-07-01 18:55:49'),
-(4, 'Web Development', 'Complete the website in a week.', 1004, '2025-07-09', 'pending', '2025-07-01 18:55:49'),
-(5, 'Hindi', 'Learn Hindi', 1001, '2025-07-12', 'pending', '2025-07-01 18:57:25'),
-(6, 'Hindi', 'Learn Hindi', 1002, '2025-07-12', 'pending', '2025-07-01 18:57:25'),
-(7, 'Hindi', 'Learn Hindi', 1003, '2025-07-12', 'pending', '2025-07-01 18:57:25'),
-(8, 'Hindi', 'Learn Hindi', 1004, '2025-07-12', 'pending', '2025-07-01 18:57:25');
+INSERT INTO `tasks` (`id`, `title`, `description`, `assigned_to`, `due_date`, `status`, `created_at`, `file_path`) VALUES
+(1, 'Web Development', 'Complete the website in a week.', 1001, '2025-07-09', 'completed', '2025-07-01 18:55:49', NULL),
+(2, 'Web Development', 'Complete the website in a week.', 1002, '2025-07-09', 'pending', '2025-07-01 18:55:49', NULL),
+(3, 'Web Development', 'Complete the website in a week.', 1003, '2025-07-09', 'pending', '2025-07-01 18:55:49', NULL),
+(4, 'Web Development', 'Complete the website in a week.', 1004, '2025-07-09', 'pending', '2025-07-01 18:55:49', NULL),
+(5, 'Hindi', 'Learn Hindi', 1001, '2025-07-12', 'in_progress', '2025-07-01 18:57:25', NULL),
+(6, 'Hindi', 'Learn Hindi', 1002, '2025-07-12', 'pending', '2025-07-01 18:57:25', NULL),
+(7, 'Hindi', 'Learn Hindi', 1003, '2025-07-12', 'pending', '2025-07-01 18:57:25', NULL),
+(8, 'Hindi', 'Learn Hindi', 1004, '2025-07-12', 'in_progress', '2025-07-01 18:57:25', NULL),
+(28, ' image', 'chck img upload', 1001, '2025-08-02', 'pending', '2025-07-03 21:47:17', ''),
+(29, ' image', 'chck img upload', 1002, '2025-08-02', 'pending', '2025-07-03 21:47:17', ''),
+(30, ' image', 'chck img upload', 1003, '2025-08-02', 'pending', '2025-07-03 21:47:17', ''),
+(31, ' image', 'chck img upload', 1004, '2025-08-02', 'pending', '2025-07-03 21:47:17', ''),
+(32, 'New test', 'testimgggggggg', 1001, '2025-07-19', 'pending', '2025-07-03 22:46:26', 'uploads/686708427bfba.png'),
+(33, 'New test', 'testimgggggggg', 1002, '2025-07-19', 'pending', '2025-07-03 22:46:26', 'uploads/686708427bfba.png'),
+(34, 'New test', 'testimgggggggg', 1003, '2025-07-19', 'pending', '2025-07-03 22:46:26', 'uploads/686708427bfba.png'),
+(35, 'New test', 'testimgggggggg', 1004, '2025-07-19', 'pending', '2025-07-03 22:46:26', 'uploads/686708427bfba.png'),
+(36, 'New task ', 'pdf checking', 1001, '2025-07-27', 'pending', '2025-07-03 23:34:39', 'uploads/6867138f2e3eb.pdf'),
+(37, 'New task ', 'pdf checking', 1002, '2025-07-27', 'pending', '2025-07-03 23:34:39', 'uploads/6867138f2e3eb.pdf'),
+(38, 'New task ', 'pdf checking', 1003, '2025-07-27', 'pending', '2025-07-03 23:34:39', 'uploads/6867138f2e3eb.pdf'),
+(39, 'New task ', 'pdf checking', 1004, '2025-07-27', 'pending', '2025-07-03 23:34:39', 'uploads/6867138f2e3eb.pdf'),
+(40, 'World War Z', 'Complete the mission', 1001, '2025-07-25', 'pending', '2025-07-04 18:04:18', 'uploads/686817a23bf7a.pdf'),
+(41, 'World War Z', 'Complete the mission', 1002, '2025-07-25', 'pending', '2025-07-04 18:04:18', 'uploads/686817a23bf7a.pdf'),
+(42, 'World War Z', 'Complete the mission', 1003, '2025-07-25', 'pending', '2025-07-04 18:04:18', 'uploads/686817a23bf7a.pdf'),
+(43, 'World War Z', 'Complete the mission', 1004, '2025-07-25', 'pending', '2025-07-04 18:04:18', 'uploads/686817a23bf7a.pdf');
 
 -- --------------------------------------------------------
 
@@ -164,7 +181,7 @@ ALTER TABLE `rollnos`
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `users`
