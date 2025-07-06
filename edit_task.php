@@ -2,43 +2,37 @@
 session_start();
 include 'partials/new_dbconnect.php';
 
-$task = null;
-$showSuccess = false;
-$showError = false;
+if (!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin'] != true) {
+    header("location: admin_login.php");
+    exit;
+}
 
-// Get task id from URL
+$task = null;
+$showSuccess = "";
+$showError = "";
+
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("Invalid task ID.");
 }
-$task_id = intval($_GET['id']);
+$task_id = $_GET['id'];
 
-// Fetch task details
-$sql = "SELECT * FROM tasks WHERE id = ?";
-$stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "i", $task_id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+$sql = "SELECT * FROM tasks WHERE id = $task_id";
+$result = mysqli_query($conn, $sql);
 $task = mysqli_fetch_assoc($result);
-mysqli_stmt_close($stmt);
 
 if (!$task) {
     die("Task not found.");
 }
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $title = trim($_POST["title"]);
-    $description = trim($_POST["description"]);
+    $title = $_POST["title"];
+    $description = $_POST["description"];
     $due_date = $_POST["due_date"];
     $status = $_POST["status"];
 
-    $update_sql = "UPDATE tasks SET title=?, description=?, due_date=?, status=? WHERE id=?";
-    $update_stmt = mysqli_prepare($conn, $update_sql);
-    mysqli_stmt_bind_param($update_stmt, "ssssi", $title, $description, $due_date, $status, $task_id);
-
-    if (mysqli_stmt_execute($update_stmt)) {
+    $update_sql = "UPDATE tasks SET title='$title', description='$description', due_date='$due_date', status='$status' WHERE id=$task_id";
+    if (mysqli_query($conn, $update_sql)) {
         $showSuccess = "Task updated successfully!";
-        // Refresh task data
         $task['title'] = $title;
         $task['description'] = $description;
         $task['due_date'] = $due_date;
@@ -46,10 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $showError = "Failed to update task. Please try again.";
     }
-    mysqli_stmt_close($update_stmt);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,47 +124,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-  <nav class="navbar navbar-custom">
+<nav class="navbar navbar-custom">
     <span class="navbar-brand">Student Task Manager</span>
     <div class="d-flex align-items-center gap-3">
-      <div class="text-center">
-        <div style="font-size: 24px; color: #0d6efd;">👤</div>
-        <div style="font-size: 13px;">
-          <?php
-            echo '@' . (isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User');
-          ?>
+        <div class="text-center">
+            <div style="font-size: 24px; color: #0d6efd;">👤</div>
+            <div style="font-size: 13px;">
+                <?php
+                if (isset($_SESSION['username'])) {
+                    echo '@' . $_SESSION['username'];
+                } else {
+                    echo 'User';
+                }
+                ?>
+            </div>
         </div>
-      </div>
-      <button class="btn-logout" onclick="location.href='logout.php.php'">Logout</button>
+        <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
     </div>
-  </nav>
+</nav>
+
 <div class="task-form-container">
     <h2>Edit Task</h2>
-    <?php if ($showSuccess): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($showSuccess) ?></div>
-    <?php endif; ?>
-    <?php if ($showError): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($showError) ?></div>
-    <?php endif; ?>
+    <?php
+    if ($showSuccess != "") {
+        echo "<div class='alert alert-success'>$showSuccess</div>";
+    }
+    if ($showError != "") {
+        echo "<div class='alert alert-danger'>$showError</div>";
+    }
+    ?>
     <form method="post">
         <div class="input-holder">
             <label for="title">Title</label>
-            <input type="text" name="title" class="input-1" id="title" value="<?= htmlspecialchars($task['title']) ?>" required>
+            <input type="text" name="title" class="input-1" id="title" value="<?php echo $task['title']; ?>" required>
         </div>
         <div class="input-holder">
             <label for="description">Description</label>
-            <textarea name="description" class="input-1" id="description" required><?= htmlspecialchars($task['description']) ?></textarea>
+            <textarea name="description" class="input-1" id="description" required><?php echo $task['description']; ?></textarea>
         </div>
         <div class="input-holder">
             <label for="due_date">Due Date</label>
-            <input type="date" name="due_date" class="input-1" id="due_date" value="<?= htmlspecialchars($task['due_date']) ?>" required>
+            <input type="date" name="due_date" class="input-1" id="due_date" value="<?php echo $task['due_date']; ?>" required>
         </div>
         <div class="input-holder">
             <label for="status">Status</label>
             <select name="status" class="input-1" id="status" required>
-                <option value="pending" <?= $task['status'] == 'pending' ? 'selected' : '' ?>>Pending</option>
-                <option value="completed" <?= $task['status'] == 'completed' ? 'selected' : '' ?>>Completed</option>
-                <option value="in progress" <?= $task['status'] == 'in progress' ? 'selected' : '' ?>>In Progress</option>
+                <option value="pending" <?php if ($task['status'] == 'pending') echo 'selected'; ?>>Pending</option>
+                <option value="completed" <?php if ($task['status'] == 'completed') echo 'selected'; ?>>Completed</option>
+                <option value="in progress" <?php if ($task['status'] == 'in progress') echo 'selected'; ?>>In Progress</option>
             </select>
         </div>
         <button type="submit">Update Task</button>

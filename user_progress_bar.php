@@ -1,96 +1,139 @@
 <?php
 session_start();
 if (!isset($_SESSION['rollno'])) {
-    header("Location: login_page.php");
+    header("Location: login.html");
     exit;
 }
 
-$mysqli = new mysqli("localhost", "root", "", "new_task_manag_db");
-if ($mysqli->connect_error) die("Connection failed: " . $mysqli->connect_error);
+$conn = mysqli_connect("localhost", "root", "", "new_task_manag_db");
+if (!$conn) die("Connection failed: " . mysqli_connect_error());
 
 $rollno = $_SESSION['rollno'];
 $today = date("Y-m-d");
 
-// ✅ CORRECTED: column name should be rollno
-$stmt = $mysqli->prepare("SELECT title, description, due_date, status FROM tasks WHERE assigned_to = ?");
-$stmt->bind_param("s", $rollno);
-$stmt->execute();
-$result = $stmt->get_result();
+$sql = "SELECT title, description, due_date, status FROM tasks WHERE assigned_to = '$rollno'";
+$result = mysqli_query($conn, $sql);
 
-$tasks = ["Pending" => [], "Completed" => [], "Overdue" => []];
+$pending = [];
+$completed = [];
+$overdue = [];
 
-while ($row = $result->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($result)) {
     $status = $row['status'];
-    $due_date = $row['due_date'];
-    
-    if ($status === 'Completed') {
-        
-      $tasks["Completed"][] = $row;
-    } elseif (strtotime($due_date) < strtotime($today)) {
-       
-      $tasks["Overdue"][] = $row;
-
+    $due = $row['due_date'];
+    if ($status == 'completed') {
+        $completed[] = $row;
+    } elseif (strtotime($due) < strtotime($today)) {
+        $overdue[] = $row;
     } else {
-        $tasks["Pending"][] = $row;
+        $pending[] = $row;
     }
 }
 
-$stmt->close();
-$mysqli->close();
+mysqli_close($conn);
 ?>
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>My Tasks</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background: #f0f8ff; font-family: 'Segoe UI'; }
-    .task-panel { padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; }
-    .task-title { font-weight: bold; }
-    .status-heading { font-size: 20px; color: #0d6efd; margin-bottom: 15px; }
-    .badge-pending { background-color: #ffc107; }
-    .badge-overdue { background-color: #dc3545; }
-    .badge-completed { background-color: #28a745; }
-  </style>
+    <title>My Tasks</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(to left, #4595e4, white); font-family: 'Segoe UI'; }
+        .task-panel { margin-top: 30px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .task-title { font-weight: bold; }
+        .status-heading { font-size: 20px; color: #0d6efd; margin-bottom: 15px; }
+        .badge-pending { background-color: #ffc107; }
+        .badge-overdue { background-color: #dc3545; }
+        .badge-completed { background-color: #28a745; }
+        .navbar-custom {
+            background: #fff;
+            padding: 12px 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 24px;
+            color: #0d6efd;
+        }
+        .btn-logout {
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 12px;
+        }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-light bg-white shadow-sm mb-4 px-4">
-  <span class="navbar-brand mb-0 h1">📋 My Tasks</span>
-  <div class="d-flex align-items-center">
-    <span class="me-3">Roll No: <?= htmlspecialchars($rollno) ?></span>
-    <a href="login.php" class="btn btn-danger btn-sm">Logout</a>
-  </div>
-</nav>
-
-<div class="container">
-  <?php foreach ($tasks as $status => $taskList): ?>
-    <div class="task-panel">
-      <h3 class="status-heading">
-        <?= $status ?> 
-        <span class="badge 
-            <?= $status === 'Pending' ? 'badge-pending' : ($status === 'Completed' ? 'badge-completed' : 'badge-overdue') ?>">
-          <?= count($taskList) ?>
-        </span>
-      </h3>
-      <?php if (count($taskList) === 0): ?>
-        <p class="text-muted">No <?= strtolower($status) ?> tasks.</p>
-      <?php else: ?>
-        <ul class="list-group">
-          <?php foreach ($taskList as $task): ?>
-            <li class="list-group-item">
-              <div class="task-title"><?= htmlspecialchars($task['title']) ?></div>
-              <div class="text-muted"><?= htmlspecialchars($task['description']) ?></div>
-              <small>Due: <?= $task['due_date'] ?></small>
-            </li>
-          <?php endforeach; ?>
-        </ul>
-      <?php endif; ?>
+<nav class="navbar navbar-custom d-flex justify-content-between align-items-center">
+    <span class="navbar-brand">Student Task Manager</span>
+    <div class="d-flex align-items-center gap-3">
+        <div class="text-center">
+            <div style="font-size: 24px; color: #0d6efd;">👤</div>
+            <div style="font-size: 13px;"><?php echo $_SESSION['username']; ?></div>
+        </div>
+        <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
     </div>
-  <?php endforeach; ?>
-</div>
+</nav>
+<div class="container">
 
+    <div class="task-panel">
+        <h3 class="status-heading">Pending 
+            <span class="badge badge-pending"><?php echo count($pending); ?></span>
+        </h3>
+        <?php if (count($pending) == 0) {
+            echo "<p class='text-muted'>No pending tasks.</p>";
+        } else {
+            echo "<ul class='list-group'>";
+            for ($i = 0; $i < count($pending); $i++) {
+                echo "<li class='list-group-item'>";
+                echo "<div class='task-title'>" . $pending[$i]['title'] . "</div>";
+                echo "<div class='text-muted'>" . $pending[$i]['description'] . "</div>";
+                echo "<small>Due: " . $pending[$i]['due_date'] . "</small>";
+                echo "</li>";
+            }
+            echo "</ul>";
+        } ?>
+    </div>
+
+    <div class="task-panel">
+        <h3 class="status-heading">completed 
+            <span class="badge badge-completed"><?php echo count($completed); ?></span>
+        </h3>
+        <?php if (count($completed) == 0) {
+            echo "<p class='text-muted'>No completed tasks.</p>";
+        } else {
+            echo "<ul class='list-group'>";
+            for ($i = 0; $i < count($completed); $i++) {
+                echo "<li class='list-group-item'>";
+                echo "<div class='task-title'>" . $completed[$i]['title'] . "</div>";
+                echo "<div class='text-muted'>" . $completed[$i]['description'] . "</div>";
+                echo "<small>Due: " . $completed[$i]['due_date'] . "</small>";
+                echo "</li>";
+            }
+            echo "</ul>";
+        } ?>
+    </div>
+
+    <div class="task-panel">
+        <h3 class="status-heading">Overdue 
+            <span class="badge badge-overdue"><?php echo count($overdue); ?></span>
+        </h3>
+        <?php if (count($overdue) == 0) {
+            echo "<p class='text-muted'>No overdue tasks.</p>";
+        } else {
+            echo "<ul class='list-group'>";
+            for ($i = 0; $i < count($overdue); $i++) {
+                echo "<li class='list-group-item'>";
+                echo "<div class='task-title'>" . $overdue[$i]['title'] . "</div>";
+                echo "<div class='text-muted'>" . $overdue[$i]['description'] . "</div>";
+                echo "<small>Due: " . $overdue[$i]['due_date'] . "</small>";
+                echo "</li>";
+            }
+            echo "</ul>";
+        } ?>
+    </div>
+
+</div>
 </body>
 </html>

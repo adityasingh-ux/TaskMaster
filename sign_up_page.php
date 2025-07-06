@@ -8,21 +8,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = "";
     $database = "new_task_manag_db";
 
-    // Create connection
     $conn = mysqli_connect($server, $username, $password, $database);
 
-    // Check connection
     if (!$conn) {
         die("Database connection failed: " . mysqli_connect_error());
     }
 
-    // Get form data
     $rollno = $_POST["rollno"];
     $username = $_POST["username"];
     $password = $_POST["password"];
     $cpassword = $_POST["confirm_password"];
 
-    // 1. Check if user already exists
     $existSql = "SELECT * FROM `users` WHERE `rollno` = '$rollno'";
     $result = mysqli_query($conn, $existSql);
 
@@ -31,7 +27,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (mysqli_num_rows($result) > 0) {
         $showError = "User with this roll number already exists.";
     } else {
-        // 2. Check if roll number exists in allowed list
         $sql1 = "SELECT * FROM `rollnos` WHERE `rollno` = '$rollno'";
         $result = mysqli_query($conn, $sql1);
 
@@ -40,11 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } elseif (mysqli_num_rows($result) == 0) {
             $showError = "Roll number not recognized. Please contact admin.";
         } else {
-            // 3. Check password match
             if ($password !== $cpassword) {
                 $showError = "Passwords do not match.";
             } else {
-                // 4. Store user in DB (you can add password hashing here)
                 $sql = "INSERT INTO `users` (`username`, `password`, `dt`, `rollno`) 
                         VALUES ('$username', '$password', current_timestamp(), '$rollno')";
 

@@ -6,7 +6,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
     exit;
 }
 
-// Fetch all due dates from tasks table
+
 $dueDates = [];
 $sql = "SELECT due_date FROM tasks";
 $result = mysqli_query($conn, $sql);

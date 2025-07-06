@@ -5,13 +5,11 @@ include 'partials/new_dbconnect.php';
 $showSuccess = false;
 $showError = false;
 
-// Get task id from URL
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("Invalid task ID.");
 }
 $task_id = intval($_GET['id']);
 
-// Handle deletion
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $sql = "DELETE FROM tasks WHERE id = ?";
     $stmt = mysqli_prepare($conn, $sql);
@@ -19,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (mysqli_stmt_execute($stmt)) {
         mysqli_stmt_close($stmt);
-        // Redirect to all_task.php (or show_task.php) after deletion
         header("Location: all_task.php?msg=Task+deleted+successfully");
         exit();
     } else {
@@ -43,3 +40,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <?php endif; ?>
     <a href="show_task.php" class="btn btn-primary">Back to All Tasks</a>
 </div>
+</body>
+</html>

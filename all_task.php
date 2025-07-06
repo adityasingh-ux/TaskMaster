@@ -105,7 +105,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
         <div style="font-size: 13px;">
           <?php
             session_start();
-            echo '@' . (isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User');
+            echo '@' . (isset($_SESSION['username']) ? $_SESSION['username'] : 'User');
           ?>
         </div>
       </div>
@@ -134,12 +134,12 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
 
     while ($row = mysqli_fetch_assoc($result)) {
         echo "<tr>
-            <td>" . htmlspecialchars($row['id']) . "</td>
-            <td>" . htmlspecialchars($row['title']) . "</td>
-            <td>" . htmlspecialchars($row['description']) . "</td>
-            <td>" . htmlspecialchars($row['assigned_to']) . "</td>
-            <td>" . htmlspecialchars($row['due_date']) . "</td>
-            <td>" . htmlspecialchars($row['status']) . "</td>";
+            <td>" . $row['id'] . "</td>
+            <td>" . $row['title'] . "</td>
+            <td>" . $row['description'] . "</td>
+            <td>" . $row['assigned_to'] . "</td>
+            <td>" . $row['due_date'] . "</td>
+            <td>" . $row['status'] . "</td>";
 
         // File column
         echo "<td>";
@@ -152,10 +152,9 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
         }
         echo "</td>";
 
-        // Action column
         echo "<td>
-                <a href='edit_task.php?id=" . urlencode($row['id']) . "' class='btn btn-edit btn-sm'>Edit</a>
-                <a href='delete_task.php?id=" . urlencode($row['id']) . "' class='btn btn-delete btn-sm' onclick=\"return confirm('Are you sure you want to delete this task?');\">Delete</a>
+                <a href='edit_task.php?id=" . $row['id'] . "' class='btn btn-edit btn-sm'>Edit</a>
+                <a href='delete_task.php?id=" . $row['id'] . "' class='btn btn-delete btn-sm' onclick=\"return confirm('Are you sure you want to delete this task?');\">Delete</a>
             </td>
         </tr>";
     }

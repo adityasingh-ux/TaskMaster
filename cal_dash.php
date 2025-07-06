@@ -6,10 +6,9 @@ if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin']!=true){
     exit;
 }
 
-// Fetch due dates for the current student's roll number
 $allDates = [];
 if (isset($_SESSION['rollno'])) {
-    $rollno = mysqli_real_escape_string($conn, $_SESSION['rollno']);
+    $rollno = $_SESSION['rollno'];
     $sql = "SELECT due_date, status FROM tasks WHERE assigned_to='$rollno'";
     $result = mysqli_query($conn, $sql);
     if ($result) {
@@ -142,7 +141,7 @@ if (isset($_SESSION['rollno'])) {
   <div class="d-flex align-items-center gap-3">
     <div class="text-center">
       <div style="font-size: 24px; color: #0d6efd;">👤</div>
-      <div style="font-size: 13px;">@<?= isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User' ?></div>
+      <div style="font-size: 13px;">@<?= isset($_SESSION['username']) ? $_SESSION['username'] : 'User' ?></div>
     </div>
     <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
   </div>

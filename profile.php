@@ -1,15 +1,13 @@
 <?php
 session_start();
-$mysqli = new mysqli("localhost", "root", "", "new_task_manag_db");
-if ($mysqli->connect_error) die("Connection failed: " . $mysqli->connect_error);
+$conn = mysqli_connect("localhost", "root", "", "new_task_manag_db");
+if (!$conn) die("Connection failed: " . mysqli_connect_error());
+
 $username = $_SESSION['username'] ?? '';
-$stmt = $mysqli->prepare("SELECT * FROM users WHERE username = ?");
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$stmt->close();
-$mysqli->close();
+$sql = "SELECT * FROM users WHERE username = '$username'";
+$result = mysqli_query($conn, $sql);
+$user = mysqli_fetch_assoc($result);
+mysqli_close($conn);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,7 +48,7 @@ $mysqli->close();
       <div class="text-center">
         <div style="font-size: 24px; color: #0d6efd;">👤</div>
         <div style="font-size: 13px;">
-          @<?= isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User' ?>
+          @<?= isset($_SESSION['username']) ? $_SESSION['username'] : 'User' ?>
         </div>
       </div>
       <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
@@ -60,12 +58,14 @@ $mysqli->close();
     <div class="card p-4 shadow-sm">
       <h3 class="mb-3">👤 Profile Details</h3>
       <?php if ($user): ?>
-        <p><strong>Name:</strong> <?= htmlspecialchars($user['username']) ?></p>
-        <p><strong>Roll No:</strong> <?= htmlspecialchars($user['rollno']) ?></p>
-        <p><strong>Created On:</strong> <?= htmlspecialchars($user['dt']) ?></p>
+        <p><strong>Name:</strong> <?= $user['username'] ?></p>
+        <p><strong>Roll No:</strong> <?= $user['rollno'] ?></p>
+        <p><strong>Created On:</strong> <?= $user['dt'] ?></p>
         <a href="cal_dash.php" class="btn btn-primary mt-3">← Back to Dashboard</a>
       <?php else: ?>
         <p>User not found.</p>
       <?php endif; ?>
     </div>
   </div>
+</body>
+</html>

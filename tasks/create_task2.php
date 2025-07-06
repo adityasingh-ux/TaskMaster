@@ -34,11 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       if (in_array($fileExtension, $allowedfileExtensions)) {
           $uploadFileDir = 'uploads/';
-          if (!is_dir($uploadFileDir)) {
-              mkdir($uploadFileDir, 0777, true);
-          }
-          $newFileName = uniqid() . '.' . $fileExtension;
-          $dest_path = $uploadFileDir . $newFileName;
+          $dest_path = $uploadFileDir . $fileName;
 
           if(move_uploaded_file($fileTmpPath, $dest_path)) {
               $file_path = $dest_path;

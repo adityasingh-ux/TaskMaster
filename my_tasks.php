@@ -2,23 +2,24 @@
 session_start();
 include 'partials/new_dbconnect.php';
 
-// Get user's roll number (assuming it's stored in session)
+if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin']!=true){
+    header("location: login_page.php");
+    exit;
+}
+
 if (!isset($_SESSION['rollno'])) {
     die("User not logged in or roll number not set.");
 }
 $rollno = $_SESSION['rollno'];
 
-// Handle AJAX status update
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['status'])) {
-    $task_id = intval($_POST['task_id']);
+    $task_id = $_POST['task_id'];
     $status = $_POST['status'];
     $allowed = ['pending', 'in_progress', 'completed'];
     if (in_array($status, $allowed)) {
-        $sql = "UPDATE tasks SET status=? WHERE id=? AND assigned_to=?";
-        $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sis", $status, $task_id, $rollno);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
+        $sql = "UPDATE tasks SET status='$status' WHERE id='$task_id' AND assigned_to='$rollno'";
+        mysqli_query($conn, $sql);
         echo "success";
     } else {
         echo "invalid status";
@@ -26,17 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
     exit;
 }
 
-// Fetch tasks for this user
-$sql = "SELECT * FROM tasks WHERE assigned_to = ?";
-$stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "s", $rollno);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+
+$sql = "SELECT * FROM tasks WHERE assigned_to = '$rollno'";
+$result = mysqli_query($conn, $sql);
 $tasks = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $tasks[] = $row;
 }
-mysqli_stmt_close($stmt);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,7 +96,7 @@ mysqli_stmt_close($stmt);
         <div class="text-center">
             <div style="font-size: 24px; color: #0d6efd;">👤</div>
             <div style="font-size: 13px;">
-                @<?= isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User' ?>
+                @<?= isset($_SESSION['username']) ? $_SESSION['username'] : 'User' ?>
             </div>
         </div>
         <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
@@ -107,49 +104,72 @@ mysqli_stmt_close($stmt);
 </nav>
 <div class="dashboard-container">
     <h2>📝 My Tasks</h2>
-    <table class="table table-bordered align-middle">
-        <thead class="table-primary">
-            <tr>
-                <th>S. No.</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Due Date</th>
-                <th>File</th> <!-- Added File column -->
-            </tr>
-        </thead>
-        <tbody>
-        <?php if (count($tasks) > 0): ?>
-            <?php foreach ($tasks as $i => $task): ?>
-                <tr>
-                    <td><?= $i + 1 ?></td>
-                    <td><?= htmlspecialchars($task['title']) ?></td>
-                    <td><?= htmlspecialchars($task['description']) ?></td>
-                    <td>
-                        <select class="form-select status-dropdown" data-task-id="<?= $task['id'] ?>">
-                            <option value="pending" <?= $task['status'] == 'pending' ? 'selected' : '' ?>>Pending</option>
-                            <option value="in_progress" <?= $task['status'] == 'in_progress' ? 'selected' : '' ?>>In Progress</option>
-                            <option value="completed" <?= $task['status'] == 'completed' ? 'selected' : '' ?>>Completed</option>
+<table class="table table-bordered align-middle">
+    <thead class="table-primary">
+        <tr>
+            <th>S. No.</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Due Date</th>
+            <th>File</th>
+            <th>Submit</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <?php
+        $sql = "SELECT * FROM tasks WHERE assigned_to = '$rollno'";
+        $result = mysqli_query($conn, $sql);
+        $serial = 1;
+
+        if (mysqli_num_rows($result) > 0) {
+            while ($task = mysqli_fetch_assoc($result)) {
+                echo "<tr>";
+                echo "<td>" . $serial++ . "</td>";
+                echo "<td>" . $task['title'] . "</td>";
+                echo "<td>" . $task['description'] . "</td>";
+
+                echo "<td>
+                        <select class='form-select status-dropdown' data-task-id='" . $task['id'] . "'>
+                            <option value='pending'" . ($task['status'] == 'pending' ? ' selected' : '') . ">Pending</option>
+                            <option value='in_progress'" . ($task['status'] == 'in_progress' ? ' selected' : '') . ">In Progress</option>
+                            <option value='completed'" . ($task['status'] == 'completed' ? ' selected' : '') . ">Completed</option>
                         </select>
-                    </td>
-                    <td><?= htmlspecialchars($task['due_date']) ?></td>
-                    <td>
-                        <?php
-                        if (!empty($task['file_path'])) {
-                            $fileName = basename($task['file_path']);
-                            $fileUrl = "/loginsystem/tasks/uploads/" . $fileName;
-                            echo "<a href='$fileUrl' class='btn btn-primary btn-sm' download>Download</a>";
-                        } else {
-                            echo "<span class='text-muted'>No file</span>";
-                        }
-                        ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr><td colspan="6" class="text-center">No tasks found.</td></tr>
-        <?php endif; ?>
-        </tbody>
+                    </td>";
+
+                echo "<td>" . $task['due_date'] . "</td>";
+
+                echo "<td>";
+                if (!empty($task['file_path'])) {
+                    $fileName = basename($task['file_path']);
+                    $fileUrl = "/loginsystem/tasks/uploads/" . $fileName;
+                    echo "<a href='$fileUrl' class='btn btn-primary btn-sm' download>Download</a>";
+                } else {
+                    echo "<span class='text-muted'>No file</span>";
+                }
+                echo "</td>";
+
+                echo "<td>";
+                $dueDate = strtotime($task['due_date']);
+                $now = strtotime(date('Y-m-d'));
+                if ($dueDate >= $now) {
+                    echo "<form method='get' action='submit_task.php' style='margin:0;'>
+                            <input type='hidden' name='task_id' value='" . $task['id'] . "'>
+                            <button type='submit' class='btn btn-success btn-sm'>Submit</button>
+                        </form>";
+                } else {
+                    echo "<button type='button' class='btn btn-secondary btn-sm' disabled>Overdue</button>";
+                }
+                echo "</td>";
+
+                echo "</tr>";
+            }
+        } else {
+            echo "<tr><td colspan='7' class='text-center'>No tasks found.</td></tr>";
+        }
+        ?>
+    </tbody>
 </table>
 </div>
 <script>
@@ -167,7 +187,6 @@ document.querySelectorAll('.status-dropdown').forEach(function(dropdown) {
         .then(data => {
             if (data.trim() !== "success") {
                 alert("Failed to update status: " + data);
-                // Optionally revert dropdown
                 selectElem.value = selectElem.getAttribute('data-original');
             } else {
                 selectElem.setAttribute('data-original', status);
@@ -175,7 +194,6 @@ document.querySelectorAll('.status-dropdown').forEach(function(dropdown) {
         });
     });
 });
-// Store original status for revert
 document.querySelectorAll('.status-dropdown').forEach(function(dropdown) {
     dropdown.setAttribute('data-original', dropdown.value);
 });
