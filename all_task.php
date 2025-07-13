@@ -121,6 +121,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
             <th>Title</th>
             <th>Description</th>
             <th>Assigned To</th>
+            <th>Department</th>
             <th>Due Date</th>
             <th>Status</th>
             <th>File</th> <!-- Added File column -->
@@ -138,6 +139,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
             <td>" . $row['title'] . "</td>
             <td>" . $row['description'] . "</td>
             <td>" . $row['assigned_to'] . "</td>
+            <td>" . $row['department'] . "</td>
             <td>" . $row['due_date'] . "</td>
             <td>" . $row['status'] . "</td>";
 

@@ -18,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST["username"];
     $password = $_POST["password"];
     $cpassword = $_POST["confirm_password"];
+    $department = $_POST["department"];
 
     $existSql = "SELECT * FROM `users` WHERE `rollno` = '$rollno'";
     $result = mysqli_query($conn, $existSql);
@@ -38,8 +39,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($password !== $cpassword) {
                 $showError = "Passwords do not match.";
             } else {
-                $sql = "INSERT INTO `users` (`username`, `password`, `dt`, `rollno`) 
-                        VALUES ('$username', '$password', current_timestamp(), '$rollno')";
+                $sql = "INSERT INTO `users` (`username`, `password`,`department`, `dt`, `rollno`) 
+                        VALUES ('$username', '$password', '$department', current_timestamp(), '$rollno')";
 
                 $result = mysqli_query($conn, $sql);
                 if ($result) {
@@ -222,6 +223,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="mb-3">
           <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
           <input type="text" class="form-control" id="username" name="username" placeholder="Choose a Username" required>
+        </div>
+        <div class="mb-3">
+          <label for="department" class="form-label">Department <span class="text-danger">*</span></label>
+          <select class="form-control" id="department" name="department" required>
+            <option value="">--Select Department--</option>
+            <option value="computer_science">computer_science</option>
+            <option value="electrical">electrical</option>
+            <option value="electronics">electronics</option>
+            <option value="information_technology">information_technology</option>
+            <option value="mechanical">mechanical</option>
+          </select>
         </div>
         <div class="mb-3">
           <label for="password" class="form-label">Password <span class="text-danger">*</span></label>

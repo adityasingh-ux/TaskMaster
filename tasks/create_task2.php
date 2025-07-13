@@ -49,15 +49,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   }
 
 
-  $user_query = "SELECT rollno FROM users";
+  $user_query = "SELECT rollno, department FROM users";
   $user_result = mysqli_query($conn, $user_query);
 
   if ($user_result && mysqli_num_rows($user_result) > 0) {
     while ($row = mysqli_fetch_assoc($user_result)) {
       $rollno = $row['rollno'];
+      $department = $row['department'];
 
-      $sql = "INSERT INTO `tasks` (`title`, `description`, `assigned_to`, `due_date`, `file_path`) 
-              VALUES ('$title', '$description', '$rollno', '$due_date', '$file_path')";
+      $sql = "INSERT INTO `tasks` (`title`, `description`, `assigned_to`, `department`,`due_date`, `file_path`) 
+              VALUES ('$title', '$description', '$rollno', '$department', '$due_date', '$file_path')";
       $result = mysqli_query($conn, $sql);
       if (!$result) {
         echo "The record was not inserted for rollno $rollno: " . mysqli_error($conn) . "<br>";

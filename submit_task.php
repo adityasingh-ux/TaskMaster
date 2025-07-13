@@ -24,6 +24,7 @@ if (isset($_SESSION['rollno'])) {
     $task_query = "SELECT id, title FROM tasks WHERE due_date >= '$now' AND status != 'completed' AND assigned_to = '$rollno'";
     $task_result = mysqli_query($conn, $task_query);
     if ($task_result && mysqli_num_rows($task_result) > 0) {
+        $department = $row['department'];
         while ($row = mysqli_fetch_assoc($task_result)) {
             $taskOptions .= "<option value='" . $row['id'] . "'>" . $row['title'] . "</option>";
         }
@@ -35,6 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $task_id = $_POST["task_id"];
     $description = $_POST["description"];
     $submission_date = date('Y-m-d');   
+
+    $dept_query = "SELECT department FROM users WHERE rollno = '$rollno'";
+    $dept_result = mysqli_query($conn, $dept_query);
+    if ($dept_result && mysqli_num_rows($dept_result) > 0) {
+        $row = mysqli_fetch_assoc($dept_result);
+        $department = $row['department'];
+    }
 
     $title = '';
     $task_title_query = "SELECT title FROM tasks WHERE id = " . intval($task_id);
@@ -54,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $allowedfileExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif'];
 
         if (in_array($fileExtension, $allowedfileExtensions)) {
-            $uploadFileDir = 'uploads/';
+            $uploadFileDir = 'tasks/uploads/';
             $dest_path = $uploadFileDir . $fileName;
 
             if(move_uploaded_file($fileTmpPath, $dest_path)) {
@@ -70,8 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     
-    $sql = "INSERT INTO `submitted_tasks` (`title`, `description`, `submitted_by`, `submission_date`, `file_path`) 
-            VALUES ('$title', '$description', '$rollno', '$submission_date', '$file_path')";
+    $sql = "INSERT INTO `submitted_tasks` (`id`,`title`, `description`, `submitted_by`, `department`, `submission_date`, `file_path`) 
+            VALUES ('$task_id', '$title', '$description', '$rollno', '$department', '$submission_date', '$file_path')";
     $result = mysqli_query($conn, $sql);
     if (!$result) {
         echo "The record was not inserted: " . mysqli_error($conn) . "<br>";

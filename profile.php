@@ -3,7 +3,7 @@ session_start();
 $conn = mysqli_connect("localhost", "root", "", "new_task_manag_db");
 if (!$conn) die("Connection failed: " . mysqli_connect_error());
 
-$username = $_SESSION['username'] ?? '';
+$username = $_SESSION['username'];
 $sql = "SELECT * FROM users WHERE username = '$username'";
 $result = mysqli_query($conn, $sql);
 $user = mysqli_fetch_assoc($result);
@@ -60,6 +60,7 @@ mysqli_close($conn);
       <?php if ($user): ?>
         <p><strong>Name:</strong> <?= $user['username'] ?></p>
         <p><strong>Roll No:</strong> <?= $user['rollno'] ?></p>
+        <p><strong>Department:</strong> <?= $user['department'] ?></p>
         <p><strong>Created On:</strong> <?= $user['dt'] ?></p>
         <a href="cal_dash.php" class="btn btn-primary mt-3">← Back to Dashboard</a>
       <?php else: ?>
