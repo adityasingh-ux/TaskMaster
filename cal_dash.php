@@ -162,7 +162,7 @@ if (isset($_SESSION['rollno'])) {
     <div class="row g-4">
       <div class="col-md-6"><a href="my_tasks.php" class="btn-tile"><div class="icon">📝</div><h4>My Tasks</h4></a></div>
       <div class="col-md-6"><a href="profile.php" class="btn-tile"><div class="icon">👤</div><h4>Profile</h4></a></div>
-      <div class="col-md-6"><a href="notifications.html" class="btn-tile"><div class="icon">🔔</div><h4>Notifications</h4></a></div>
+      <div class="col-md-6"><a href="submit_task.php" class="btn-tile"><div class="icon">📥</div><h4>Submit Tasks</h4></a></div>
       <div class="col-md-6"><a href="user_progress_bar.php" class="btn-tile"><div class="icon">📊</div><h4>Progress</h4></a></div>
     </div>
   </div>

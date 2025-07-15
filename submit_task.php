@@ -18,10 +18,10 @@ if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin']!=true){
 }
 
 $taskOptions = '';
-$now = strtotime(date('Y-m-d'));
+$today = date('Y-m-d');
 if (isset($_SESSION['rollno'])) {
     $rollno = $_SESSION['rollno'];
-    $task_query = "SELECT id, title FROM tasks WHERE due_date >= '$now' AND status != 'completed' AND assigned_to = '$rollno'";
+    $task_query = "SELECT id, title FROM tasks WHERE due_date >= '$today' AND status != 'completed' AND assigned_to = '$rollno'";
     $task_result = mysqli_query($conn, $task_query);
     if ($task_result && mysqli_num_rows($task_result) > 0) {
         $department = $row['department'];
@@ -37,10 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $description = $_POST["description"];
     $submission_date = date('Y-m-d');   
 
-    $dept_query = "SELECT department FROM users WHERE rollno = '$rollno'";
-    $dept_result = mysqli_query($conn, $dept_query);
-    if ($dept_result && mysqli_num_rows($dept_result) > 0) {
-        $row = mysqli_fetch_assoc($dept_result);
+    $info_query = "SELECT username, department FROM users WHERE rollno = '$rollno'";
+    $info_result = mysqli_query($conn, $info_query);
+    if ($info_result && mysqli_num_rows($info_result) > 0) {
+        $row = mysqli_fetch_assoc($info_result);
+        $username = $row['username'];
         $department = $row['department'];
     }
 
@@ -73,14 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             echo "Upload failed. Allowed types: " . implode(',', $allowedfileExtensions) . "<br>";
         }
-    } else {
-        echo "No file uploaded or upload error: " . $_FILES['task_file']['error'] . "<br>";
     }
 
     
-    $sql = "INSERT INTO `submitted_tasks` (`id`,`title`, `description`, `submitted_by`, `department`, `submission_date`, `file_path`) 
-            VALUES ('$task_id', '$title', '$description', '$rollno', '$department', '$submission_date', '$file_path')";
+    $sql = "INSERT INTO `submitted_tasks` (`task_id`,`title`, `description`, `submitted_by`, `username`, `department`, `submission_date`, `file_path`) 
+            VALUES ('$task_id', '$title', '$description', '$rollno', '$username', '$department', '$submission_date', '$file_path')";
     $result = mysqli_query($conn, $sql);
+    $sql2 = "UPDATE `tasks` SET `status` = 'completed' WHERE `id` = '$task_id'";
+    mysqli_query($conn, $sql2);
     if (!$result) {
         echo "The record was not inserted: " . mysqli_error($conn) . "<br>";
     } else {
@@ -191,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           ?>
         </div>
       </div>
-      <button class="btn-logout" onclick="location.href='../login_page.php'">Logout</button>
+      <button class="btn-logout" onclick="location.href='login_page.php'">Logout</button>
     </div>
   </nav>
 

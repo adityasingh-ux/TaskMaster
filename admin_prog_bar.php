@@ -1,30 +1,31 @@
 <?php
 session_start();
-$conn = mysqli_connect("localhost", "root", "", "new_task_manag_db");
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+
+// Connect to the database
+$mysqli = new mysqli("localhost", "root", "", "new_task_manag_db");
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
 }
 
-$sql = "SELECT users.username, tasks.title, tasks.due_date, tasks.status 
-        FROM tasks 
-        INNER JOIN users ON tasks.assigned_to = users.rollno 
+// Fetch all tasks joined with usernames
+$sql = "SELECT users.username, users.rollno, tasks.title, tasks.due_date, tasks.status, tasks.id
+        FROM tasks
+        INNER JOIN users ON tasks.assigned_to = users.rollno
         ORDER BY users.username, tasks.due_date";
 
-$result = mysqli_query($conn, $sql);
 
-$tasksByStudent = array();
-while ($row = mysqli_fetch_assoc($result)) {
+$result = $mysqli->query($sql);
+
+// Group tasks by student username
+$tasksByStudent = [];
+while ($row = $result->fetch_assoc()) {
     $username = $row['username'];
-    if (!isset($tasksByStudent[$username])) {
-        $tasksByStudent[$username] = array();
-    }
     $tasksByStudent[$username][] = $row;
 }
-
-mysqli_close($conn);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,16 +38,19 @@ mysqli_close($conn);
       margin: 0;
       padding: 0;
     }
+
     .navbar-custom {
       background: #fff;
       padding: 12px 30px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
     }
+
     .navbar-brand {
       font-weight: 700;
       font-size: 24px;
       color: #0d6efd;
     }
+
     .btn-logout {
       background: #0d6efd;
       color: white;
@@ -54,9 +58,11 @@ mysqli_close($conn);
       border-radius: 4px;
       padding: 5px 12px;
     }
+
     .container {
       margin-top: 30px;
     }
+
     .student-section {
       background: white;
       border-radius: 10px;
@@ -64,113 +70,103 @@ mysqli_close($conn);
       margin-bottom: 30px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
+
     .task-bar {
       display: flex;
-      align-items: left;
+      align-items: center;
       justify-content: space-between;
       border-left: 6px solid;
       border-radius: 5px;
       padding: 15px 20px;
       margin-bottom: 10px;
-      background-color: #f8f9fa;
     }
-    .task-pending {
-      border-left-color: #ffc107;
-      background-color: #fff9e6;
-    }
-    .task-completed {
-      border-left-color: #28a745;
-      background-color: #e8f5e9;
-    }
-    .task-overdue {
-      border-left-color: #dc3545;
-      background-color: #fdecea;
-    }
+
     .task-title {
       font-weight: 600;
       font-size: 16px;
     }
+
     .status-badge {
       font-size: 0.8rem;
       padding: 6px 12px;
       border-radius: 20px;
-    }
-    .badge-pending {
-      background-color: #ffc107;
-      color: #212529;
-    }
-    .badge-completed {
-      background-color: #28a745;
       color: white;
-    }
-    .badge-overdue {
-      background-color: #dc3545;
-      color: white;
-    }
-    .view-submission {
-      background-color: #0d6efd;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 5px 10px;
-      cursor: pointer;
+      margin-left: 10px;
     }
   </style>
 </head>
+
 <body>
-
-<nav class="navbar navbar-custom d-flex justify-content-between align-items-center">
-  <span class="navbar-brand">Student Task Manager</span>
-  <div class="d-flex align-items-center gap-3">
-    <div class="text-center">
-      <div style="font-size: 24px; color: #0d6efd;">👤</div>
-      <div style="font-size: 13px;">
-        <?php
-        if (isset($_SESSION['username'])) {
-            echo $_SESSION['username'];
-        } else {
-            echo 'User';
-        }
-        ?>
+  <!-- Navbar -->
+  <nav class="navbar navbar-custom d-flex justify-content-between align-items-center">
+    <span class="navbar-brand">Student Task Manager</span>
+    <div class="d-flex align-items-center gap-3">
+      <div class="text-center">
+        <div style="font-size: 24px; color: #0d6efd;">👤</div>
+        <div style="font-size: 13px;">
+          @<?= isset($_SESSION['username']) ? $_SESSION['username'] : 'User'; ?>
+        </div>
       </div>
+      <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
     </div>
-    <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
-  </div>
-</nav>
+  </nav>
 
+  <!-- Task Display -->
 <div class="container">
-  <?php
-  foreach ($tasksByStudent as $username => $taskList) {
-      echo '<div class="student-section">';
-      echo '<h4 class="mb-3">' . $username . '</h4>';
-      for ($i = 0; $i < count($taskList); $i++) {
-          $task = $taskList[$i];
-          $status = strtolower($task['status']);
-          $class = 'task-pending';
-          $badge = 'badge-pending';
+  <?php 
+  foreach ($tasksByStudent as $username => $tasks) {
+  ?>
+    <div class="student-section">
+      <h4 class="mb-3">
+        <?php echo $username; ?>
+      </h4>
+      <?php 
+      foreach ($tasks as $task) {
+        $status = strtolower(trim($task['status'])); // sanitize input
 
-          if ($status == 'completed') {
-              $class = 'task-completed';
-              $badge = 'badge-completed';
-          } else if ($status == 'overdue') {
-              $class = 'task-overdue';
-              $badge = 'badge-overdue';
-          }
-
-          echo '<div class="task-bar ' . $class . '">';
-          echo '<span class="task-title">📌 ' . $task['title'] . ' <small class="text-muted">(Due: ' . $task['due_date'] . ')</small></span>';
-          echo '<div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">';
-          if ($status == 'completed') {
-              echo '<button class="view-submission" onclick="alert(\'Viewing submission for ' . $task['title'] . '\')">View Submission</button>';
-          }
-          echo '<span class="status-badge ' . $badge . ' text-uppercase">' . $status . '</span>';
-          echo '</div>';
-          echo '</div>';
-      }
-      echo '</div>';
-  }
+        if ($status === 'completed') {
+          $statusColor = '#28a745'; // green
+          $bgColor = '#e8f5e9';
+        } elseif ($status === 'pending') {
+          $statusColor = '#ffc107'; // yellow
+          $bgColor = '#fff9e6';
+        } elseif ($status === 'in_progress') {
+          $statusColor = '#ffc107'; // yellow
+          $bgColor = '#fff9e6';
+        } else {
+          // fallback color
+          $statusColor = '#f20933'; // red
+          $bgColor = '#f0f0f0';
+        }
+      ?>
+        <div class="task-bar" style="border-left-color: <?php echo $statusColor; ?>; background-color: <?php echo $bgColor; ?>;">
+          <span class="task-title">📌
+            <?php echo $task['title']; ?>
+            <small class="text-muted">(Due: <?php echo $task['due_date']; ?>)</small>
+          </span>
+          <div>
+            <?php 
+            if ($status === 'completed') {
+              ?>
+              <a href="view_submission.php?rollno=<?php echo $task['rollno']; ?>&title=<?php echo $task['title']; ?>" class="btn btn-sm btn-primary">View Submission</a>
+              <?php 
+            }
+            ?>
+            <span class="status-badge" style="background-color: <?php echo $statusColor; ?>;">
+              <?php echo $task['status']; ?>
+            </span>
+          </div>
+        </div>
+      <?php 
+      } // end task loop
+      ?>
+    </div>
+  <?php 
+  } // end student loop
   ?>
 </div>
 
+
 </body>
+
 </html>

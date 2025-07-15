@@ -49,7 +49,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
             letter-spacing: 1px;
         }
         .dashboard-container {
-            max-width: 1100px;
+            max-width: 1400px;
             margin: 40px auto;
             background: #fff;
             border-radius: 15px;
@@ -121,6 +121,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
             <th>Title</th>
             <th>Description</th>
             <th>Assigned To</th>
+            <th>Username</th>
             <th>Department</th>
             <th>Due Date</th>
             <th>Status</th>
@@ -130,7 +131,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
     </thead>
     <tbody>
     <?php
-    $sql = "SELECT * FROM tasks";
+    $sql = "SELECT * FROM tasks where `status`!= 'completed'";
     $result = mysqli_query($conn, $sql);
 
     while ($row = mysqli_fetch_assoc($result)) {
@@ -139,6 +140,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
             <td>" . $row['title'] . "</td>
             <td>" . $row['description'] . "</td>
             <td>" . $row['assigned_to'] . "</td>
+            <td>" . $row['username'] . "</td>
             <td>" . $row['department'] . "</td>
             <td>" . $row['due_date'] . "</td>
             <td>" . $row['status'] . "</td>";

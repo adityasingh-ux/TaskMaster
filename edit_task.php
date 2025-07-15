@@ -28,15 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $title = $_POST["title"];
     $description = $_POST["description"];
     $due_date = $_POST["due_date"];
-    $status = $_POST["status"];
 
-    $update_sql = "UPDATE tasks SET title='$title', description='$description', due_date='$due_date', status='$status' WHERE id=$task_id";
+    $update_sql = "UPDATE tasks SET title='$title', description='$description', due_date='$due_date' WHERE id=$task_id";
     if (mysqli_query($conn, $update_sql)) {
         $showSuccess = "Task updated successfully!";
         $task['title'] = $title;
         $task['description'] = $description;
         $task['due_date'] = $due_date;
-        $task['status'] = $status;
     } else {
         $showError = "Failed to update task. Please try again.";
     }
@@ -165,14 +163,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="input-holder">
             <label for="due_date">Due Date</label>
             <input type="date" name="due_date" class="input-1" id="due_date" value="<?php echo $task['due_date']; ?>" required>
-        </div>
-        <div class="input-holder">
-            <label for="status">Status</label>
-            <select name="status" class="input-1" id="status" required>
-                <option value="pending" <?php if ($task['status'] == 'pending') echo 'selected'; ?>>Pending</option>
-                <option value="completed" <?php if ($task['status'] == 'completed') echo 'selected'; ?>>Completed</option>
-                <option value="in progress" <?php if ($task['status'] == 'in progress') echo 'selected'; ?>>In Progress</option>
-            </select>
         </div>
         <button type="submit">Update Task</button>
     </form>

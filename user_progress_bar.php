@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['rollno'])) {
-    header("Location: login.html");
+    header("Location: login_page.php");
     exit;
 }
 
@@ -70,7 +70,7 @@ mysqli_close($conn);
     <div class="d-flex align-items-center gap-3">
         <div class="text-center">
             <div style="font-size: 24px; color: #0d6efd;">👤</div>
-            <div style="font-size: 13px;"><?php echo $_SESSION['username']; ?></div>
+            <div style="font-size: 13px;">@<?php echo $_SESSION['username']; ?></div>
         </div>
         <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
     </div>

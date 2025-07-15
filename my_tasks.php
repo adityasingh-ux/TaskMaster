@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
 }
 
 
-$sql = "SELECT * FROM tasks WHERE assigned_to = '$rollno'";
+$sql = "SELECT * FROM tasks WHERE assigned_to = '$rollno' and `status`!= 'completed' ";
 $result = mysqli_query($conn, $sql);
 $tasks = [];
 while ($row = mysqli_fetch_assoc($result)) {
@@ -113,13 +113,12 @@ while ($row = mysqli_fetch_assoc($result)) {
             <th>Status</th>
             <th>Due Date</th>
             <th>File</th>
-            <th>Submit</th>
         </tr>
     </thead>
     <tbody>
 
         <?php
-        $sql = "SELECT * FROM tasks WHERE assigned_to = '$rollno'";
+        $sql = "SELECT * FROM tasks WHERE assigned_to = '$rollno' AND `status`!= 'completed'";
         $result = mysqli_query($conn, $sql);
         $serial = 1;
 
@@ -134,12 +133,17 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <select class='form-select status-dropdown' data-task-id='" . $task['id'] . "'>
                             <option value='pending'" . ($task['status'] == 'pending' ? ' selected' : '') . ">Pending</option>
                             <option value='in_progress'" . ($task['status'] == 'in_progress' ? ' selected' : '') . ">In Progress</option>
-                            <option value='completed'" . ($task['status'] == 'completed' ? ' selected' : '') . ">Completed</option>
                         </select>
                     </td>";
-
-                echo "<td>" . $task['due_date'] . "</td>";
-
+                $status = $task['status'];
+                $dueDate = strtotime($task['due_date']);
+                $now = strtotime(date('Y-m-d'));
+                if ($dueDate >= $now and $status != 'completed') {
+                    echo "<td>" . $task['due_date'] . "</td>";
+                }  
+                else{
+                    echo "<td>" . $task['due_date'] . " (overdue) </td>";
+                }
                 echo "<td>";
                 if (!empty($task['file_path'])) {
                     $fileName = basename($task['file_path']);
@@ -147,19 +151,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                     echo "<a href='$fileUrl' class='btn btn-primary btn-sm' download>Download</a>";
                 } else {
                     echo "<span class='text-muted'>No file</span>";
-                }
-                echo "</td>";
-
-                echo "<td>";
-                $dueDate = strtotime($task['due_date']);
-                $now = strtotime(date('Y-m-d'));
-                if ($dueDate >= $now) {
-                    echo "<form method='get' action='submit_task.php' style='margin:0;'>
-                            <input type='hidden' name='task_id' value='" . $task['id'] . "'>
-                            <button type='submit' class='btn btn-success btn-sm'>Submit</button>
-                        </form>";
-                } else {
-                    echo "<button type='button' class='btn btn-secondary btn-sm' disabled>Overdue</button>";
                 }
                 echo "</td>";
 
