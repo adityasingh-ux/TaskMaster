@@ -112,7 +112,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
     <div class="row g-4">
       <div class="col-md-6"><a href="all_task.php" class="btn-tile"><div class="icon">📝</div><h4>All Students Tasks</h4></a></div>
       <div class="col-md-6"><a href="manage_stud.php" class="btn-tile"><div class="icon">👥</div><h4>Manage Students</h4></a></div>
-      <div class="col-md-6"><a href="tasks/create_task2.php" class="btn-tile"><div class="icon">📅</div><h4>Add Task</h4></a></div>
+      <div class="col-md-6"><a href="tasks/create_task.php" class="btn-tile"><div class="icon">📅</div><h4>Add Task</h4></a></div>
       <div class="col-md-6"><a href="admin_prog_bar.php" class="btn-tile"><div class="icon">📊</div><h4>Track Progress</h4></a></div>
     </div>
   </div>

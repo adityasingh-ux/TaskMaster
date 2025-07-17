@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   <div class="task-form-container">
     <h2>Add New Task</h2>
-    <form action="create_task2.php" method="post" enctype="multipart/form-data">
+    <form action="create_task.php" method="post" enctype="multipart/form-data">
       <label for="title">Task Title</label>
       <input type="text" id="title" name="title" placeholder="e.g. Submit Assignment" required>
 

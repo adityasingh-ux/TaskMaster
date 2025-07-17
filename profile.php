@@ -74,7 +74,7 @@ $user = mysqli_fetch_assoc($result);
         <p><strong>Roll No:</strong> <?= $user['rollno'] ?></p>
         <p><strong>Department:</strong> <?= $user['department'] ?></p>
         <p><strong>Created On:</strong> <?= $user['dt'] ?></p>
-        <a href="cal_dash.php" class="btn btn-primary mt-3">← Back to Dashboard</a>
+        <a href="user_dashboard.php" class="btn btn-primary mt-3">← Back to Dashboard</a>
       <?php } 
       else { ?>
         <p>User not found.</p>
