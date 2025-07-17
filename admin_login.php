@@ -134,22 +134,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .login a:hover {
       text-decoration: underline;
     }
-    @media (max-width: 768px) {
-      .container-main {
-        flex-direction: column;
-        text-align: center;
-      }
-      .left-content {
-        margin-right: 0;
-        margin-bottom: 40px;
-      }
-      .college-name {
-        font-size: 0.95rem;
-      }
-      .college-logo {
-        height: 36px;
-      }
-    }
     .footer {
       text-align: center;
       font-size: 14px;
