@@ -1,27 +1,26 @@
 <?php
 session_start();
-
-// Connect to the database
-$mysqli = new mysqli("localhost", "root", "", "new_task_manag_db");
-if ($mysqli->connect_error) {
-    die("Connection failed: " . $mysqli->connect_error);
+$servername = "localhost";
+$username = "root";
+$password = "";
+$database = "new_task_manag_db";
+$conn = mysqli_connect($servername, $username, $password, $database);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
 }
-
-// Fetch all tasks joined with usernames
 $sql = "SELECT users.username, users.rollno, tasks.title, tasks.due_date, tasks.status, tasks.id
         FROM tasks
         INNER JOIN users ON tasks.assigned_to = users.rollno
         ORDER BY users.username, tasks.due_date";
-
-
-$result = $mysqli->query($sql);
-
-// Group tasks by student username
+$result = mysqli_query($conn, $sql);
 $tasksByStudent = [];
-while ($row = $result->fetch_assoc()) {
-    $username = $row['username'];
-    $tasksByStudent[$username][] = $row;
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $uname = $row['username'];
+        $tasksByStudent[$uname][] = $row;
+    }
 }
+mysqli_close($conn);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -104,7 +103,7 @@ while ($row = $result->fetch_assoc()) {
       <div class="text-center">
         <div style="font-size: 24px; color: #0d6efd;">👤</div>
         <div style="font-size: 13px;">
-          @<?= isset($_SESSION['username']) ? $_SESSION['username'] : 'User'; ?>
+          @<?=  $_SESSION['username']; ?>
         </div>
       </div>
       <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
@@ -112,61 +111,40 @@ while ($row = $result->fetch_assoc()) {
   </nav>
 
   <!-- Task Display -->
-<div class="container">
-  <?php 
-  foreach ($tasksByStudent as $username => $tasks) {
-  ?>
-    <div class="student-section">
-      <h4 class="mb-3">
-        <?php echo $username; ?>
-      </h4>
-      <?php 
-      foreach ($tasks as $task) {
-        $status = strtolower(trim($task['status'])); // sanitize input
-
-        if ($status === 'completed') {
-          $statusColor = '#28a745'; // green
-          $bgColor = '#e8f5e9';
-        } elseif ($status === 'pending') {
-          $statusColor = '#ffc107'; // yellow
-          $bgColor = '#fff9e6';
-        } elseif ($status === 'in_progress') {
-          $statusColor = '#ffc107'; // yellow
-          $bgColor = '#fff9e6';
-        } else {
-          // fallback color
-          $statusColor = '#f20933'; // red
-          $bgColor = '#f0f0f0';
-        }
-      ?>
+  <div class="container">
+    <?php foreach ($tasksByStudent as $username => $tasks) { ?>
+      <div class="student-section">
+        <h4 class="mb-3"><?php echo $username; ?></h4>
+        <?php foreach ($tasks as $task) {
+          $status = strtolower(trim($task['status']));
+          if ($task['due_date'] < date('Y-m-d') && $status !== 'completed') {
+            $status = 'overdue';
+          }
+          if ($status === 'completed') {
+            $statusColor = '#28a745'; $bgColor = '#e8f5e9';
+          } elseif ($status === 'pending' || $status === 'in_progress') {
+            $statusColor = '#ffc107'; $bgColor = '#fff9e6';
+          } elseif ($status === 'overdue') {
+            $statusColor = '#dc3545'; $bgColor = '#f8d7da';
+          } else {
+            $statusColor = '#999495ff'; $bgColor = '#f0f0f0';
+          }
+        ?>
         <div class="task-bar" style="border-left-color: <?php echo $statusColor; ?>; background-color: <?php echo $bgColor; ?>;">
-          <span class="task-title">📌
-            <?php echo $task['title']; ?>
-            <small class="text-muted">(Due: <?php echo $task['due_date']; ?>)</small>
-          </span>
+          <span class="task-title">📌 <?php echo $task['title']; ?> <small class="text-muted">(Due: <?php echo $task['due_date']; ?>)</small></span>
           <div>
-            <?php 
-            if ($status === 'completed') {
-              ?>
+            <?php if ($status === 'completed') { ?>
               <a href="view_submission.php?rollno=<?php echo $task['rollno']; ?>&title=<?php echo $task['title']; ?>" class="btn btn-sm btn-primary">View Submission</a>
-              <?php 
-            }
-            ?>
+            <?php } ?>
             <span class="status-badge" style="background-color: <?php echo $statusColor; ?>;">
-              <?php echo $task['status']; ?>
+              <?php echo $status; ?>
             </span>
           </div>
         </div>
-      <?php 
-      } // end task loop
-      ?>
-    </div>
-  <?php 
-  } // end student loop
-  ?>
-</div>
-
-
+        <?php } ?>
+      </div>
+    <?php } ?>
+  </div>
 </body>
 
 </html>

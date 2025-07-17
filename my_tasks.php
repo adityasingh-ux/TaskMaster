@@ -42,16 +42,16 @@ while ($row = mysqli_fetch_assoc($result)) {
     <title>My Tasks</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <style>
-        body {
-            background: linear-gradient(to left, #4595e4, white);
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-        }
+       body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f2ff, #80bfff);
+      margin: 0;
+    }
         .navbar-custom {
             background: #fff;
-            border-bottom: 2px solid #0d6efd;
+            /* border-bottom: 2px solid #0d6efd; */
             padding: 10px 30px;
-            margin-bottom: 30px;
+            /* margin-bottom: 30px; */
             box-shadow: 0 2px 8px rgba(13, 110, 253, 0.04);
             display: flex;
             justify-content: space-between;

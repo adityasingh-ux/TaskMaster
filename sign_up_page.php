@@ -23,17 +23,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $existSql = "SELECT * FROM `users` WHERE `rollno` = '$rollno'";
     $result = mysqli_query($conn, $existSql);
 
-    if (!$result) {
-        $showError = "Error checking existing user: " . mysqli_error($conn);
-    } elseif (mysqli_num_rows($result) > 0) {
+    if (mysqli_num_rows($result) > 0) {
         $showError = "User with this roll number already exists.";
     } else {
         $sql1 = "SELECT * FROM `rollnos` WHERE `rollno` = '$rollno'";
         $result = mysqli_query($conn, $sql1);
 
-        if (!$result) {
-            $showError = "Error verifying roll number: " . mysqli_error($conn);
-        } elseif (mysqli_num_rows($result) == 0) {
+        if (mysqli_num_rows($result) == 0) {
             $showError = "Roll number not recognized. Please contact admin.";
         } else {
             if ($password !== $cpassword) {
@@ -71,9 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     .navbar-custom {
       background: #fff;
-      border-bottom: 2px solid #0d6efd;
+      /* border-bottom: 2px solid #0d6efd; */
       padding: 10px 30px;
-      margin-bottom: 30px;
+      /* margin-bottom: 30px; */
       box-shadow: 0 2px 8px rgba(13, 110, 253, 0.04);
       display: flex;
       justify-content: space-between;
@@ -116,10 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       font-weight: bold;
       color: #0d47a1;
     }
-    .subtitle {
-      font-size: 18px;
-      color: #333;
-    }
+   
     .signup-container {
       background: #ffffff;
       padding: 30px;
@@ -155,27 +148,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .login a:hover {
       text-decoration: underline;
     }
-    @media (max-width: 768px) {
-      .container-main {
-        flex-direction: column;
-        text-align: center;
-      }
-      .left-content {
-        margin-right: 0;
-        margin-bottom: 40px;
-      }
-      .college-name {
-        font-size: 0.95rem;
-      }
-      .college-logo {
-        height: 36px;
-      }
-    }
     .footer {
       text-align: center;
-      font-size: 14px;
-      color: #555;
+      margin-top: 30px;
     }
+    
   </style>
 </head>
 
@@ -190,27 +167,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <?php
     if ($showAlert) {
-        echo ' <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Success!</strong> Your account is now created and you can login
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-    </div> ';
+        echo ' <div class="alert alert-success" role="alert">
+        <strong>Success!</strong> Your account has been created successfully.
+</div> ';
     }
     if ($showError) {
-        echo ' <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        echo ' <div class="alert alert-danger" role="alert">
         <strong>Error!</strong> ' . $showError . '
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-    </div> ';
+</div> ';
     }
   ?>
 
   <div class="container-main">
     <div class="left-content">
       <h1 class="page-title">Student Task Manager</h1>
-      <p class="subtitle">Welcome! Organize your tasks, set deadlines, and stay on track with your academic goals.</p>
+      <p>Welcome! Organize your tasks, set deadlines, and stay on track with your academic goals.</p>
     </div>
 
     <div class="signup-container">

@@ -9,7 +9,7 @@ $conn = mysqli_connect($servername, $username, $password, $database);
 if (!$conn) {
     die("Sorry, we failed to connect: " . mysqli_connect_error());
 }
-$sql = "SELECT * FROM rollnos ORDER BY sno ASC";
+$sql = "SELECT * FROM users ORDER BY sno ASC";
 $students = mysqli_query($conn, $sql);
 
 session_start();?>
@@ -118,6 +118,7 @@ session_start();?>
       <thead>
         <tr>
           <th>S. No.</th>
+          <th>Name</th>
           <th>Department</th>
           <th>Roll Number</th>
           <th>Action</th>
@@ -128,6 +129,9 @@ session_start();?>
         <tr>
           <td>
             <?php echo $count++; ?>
+          </td>
+          <td>
+            <?php echo $row['username']; ?>
           </td>
           <td>
             <?php echo $row['department']; ?>

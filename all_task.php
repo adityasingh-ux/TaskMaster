@@ -104,7 +104,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
         <div style="font-size: 24px; color: #0d6efd;">👤</div>
         <div style="font-size: 13px;">
           <?php
-            session_start();
+            
             echo '@' . (isset($_SESSION['username']) ? $_SESSION['username'] : 'User');
           ?>
         </div>

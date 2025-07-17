@@ -23,7 +23,7 @@ if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin']!=true){
     }
     .navbar-custom {
       background: #fff;
-      padding: 12px 30px;
+      padding: 10px 30px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.06);
     }
     .navbar-brand {
@@ -51,7 +51,7 @@ if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin']!=true){
       background: white;
       border-radius: 20px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-      padding: 60px 60px 50px 60px;
+      padding: 40px 60px 50px 60px;
       max-width: 1000px;
       width: 100%;
       min-width: 400px;

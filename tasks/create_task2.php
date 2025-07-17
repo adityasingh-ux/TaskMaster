@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to left, #4595e4, white);
       min-height: 100vh;
       margin: 0;
@@ -88,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     .navbar-custom {
       background: #fff;
-      border-bottom: 2px solid #0d6efd;
+      /* border-bottom: 2px solid #0d6efd; */
       padding: 12px 30px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-      margin-bottom: 30px;
+      /* margin-bottom: 30px; */
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -116,7 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       width: 400px;
-      margin: 0 auto;
+      margin: 30px auto;
+      margin-top: 100px;
     }
     h2 {
       text-align: center;
@@ -168,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div style="font-size: 24px; color: #0d6efd;">👤</div>
         <div style="font-size: 13px;">
           <?php
-            session_start();
+          
             echo '@' . (isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User');
           ?>
         </div>

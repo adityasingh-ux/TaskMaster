@@ -80,7 +80,7 @@ $task = mysqli_fetch_assoc($result);
       <div class="details" style="text-align : left;">
       <p><strong>Title:</strong> <?= $task['title'] ?></p>
         <p><strong>Description:</strong> 
-        <div class="text_area" ><?= htmlspecialchars($task['description']) ?></div>
+        <div class="text_area" ><?= $task['description'] ?></div>
           </p>
         <p><strong>Submitted By:</strong> <?= $task['submitted_by'] ?></p>
         <p><strong>Submitted On:</strong> <?= $task['submission_date'] ?></p>

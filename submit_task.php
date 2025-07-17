@@ -1,4 +1,5 @@
 <?php
+$alert = FALSE;
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -24,7 +25,7 @@ if (isset($_SESSION['rollno'])) {
     $task_query = "SELECT id, title FROM tasks WHERE due_date >= '$today' AND status != 'completed' AND assigned_to = '$rollno'";
     $task_result = mysqli_query($conn, $task_query);
     if ($task_result && mysqli_num_rows($task_result) > 0) {
-        $department = $row['department'];
+        
         while ($row = mysqli_fetch_assoc($task_result)) {
             $taskOptions .= "<option value='" . $row['id'] . "'>" . $row['title'] . "</option>";
         }
@@ -85,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!$result) {
         echo "The record was not inserted: " . mysqli_error($conn) . "<br>";
     } else {
-        echo "<div class='alert alert-success'>Task submitted successfully!</div>";
+        $alert= TRUE;
     }
 }
 ?>
@@ -100,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to left, #4595e4, white);
       min-height: 100vh;
       margin: 0;
@@ -108,10 +109,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     .navbar-custom {
       background: #fff;
-      border-bottom: 2px solid #0d6efd;
+      /* border-bottom: 2px solid #0d6efd; */
       padding: 12px 30px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-      margin-bottom: 30px;
+      /* margin-bottom: 30px; */
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -137,6 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       width: 400px;
       margin: 0 auto;
+      margin-top: 155px;
     }
     h2 {
       text-align: center;
@@ -195,7 +197,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <button class="btn-logout" onclick="location.href='login_page.php'">Logout</button>
     </div>
   </nav>
-
+  <?php
+  
+  if ($alert) {
+    echo '<div class="alert alert-success" role="alert">
+  <strong>Success!</strong> Task submitted successfully.
+</div>';
+  }
+?>
   <div class="task-form-container">
     <h2>Submit Task</h2>
     <form action="submit_task.php" method="post" enctype="multipart/form-data">

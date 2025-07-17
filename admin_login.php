@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $database = "new_task_manag_db";
 
   $conn = mysqli_connect($server, $username, $password, $database);
-  if (!$conn) {
+  if (!$conn) { 
       die("Error". mysqli_connect_error());
   }
 
@@ -48,9 +48,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     .navbar-custom {
       background: #fff;
-      border-bottom: 2px solid #0d6efd;
+      /* border-bottom: 2px solid #0d6efd; */
       padding: 10px 30px;
-      margin-bottom: 30px;
+      /* margin-bottom: 30px; */
       box-shadow: 0 2px 8px rgba(13, 110, 253, 0.04);
       display: flex;
       justify-content: space-between;
@@ -83,6 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       justify-content: center;
       align-items: center;
       padding: 50px 20px;
+      margin-top: 80px;
     }
     .left-content {
       max-width: 500px;
@@ -168,21 +169,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </nav>
 
   <?php
-    if ($login) {
-      echo ' <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Success!</strong> You are logged in
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-      </div> ';
+    if ($admin_login) {
+      echo ' <div class="alert alert-success" role="alert">
+  <strong>Success!</strong> You are logged in.
+</div>';
     }
     if ($showError) {
-      echo ' <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      echo ' <div class="alert alert-danger" role="alert">
         <strong>Error!</strong> ' . $showError . '
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-      </div> ';
+</div>';
     }
   ?>
 
