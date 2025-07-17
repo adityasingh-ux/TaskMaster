@@ -22,18 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  
     $rollno = $_POST['rollno'];
     $department = $_POST['department'];
-    //  while ($user = mysqli_fetch_assoc($result)) {
-    //     if ($rollno == $user['rollno']) {
-    //         echo "This roll number already exists in the database.";
-    //         exit();
-    //     }
-    //     else{
-    //      $sql = "INSERT INTO rollnos (`rollno`, `department`) VALUES ('$rollno', '$department')";
-    //       mysqli_query($conn, $sql);
-    //     }
-    // }
-   $sql = "SELECT * FROM rollnos WHERE rollno = '$rollno'";
-   $result = mysqli_query($conn, $sql);
+    $sql = "SELECT * FROM rollnos WHERE rollno = '$rollno'";
+    $result = mysqli_query($conn, $sql);
    
 
  if (mysqli_num_rows($result) > 0) {
@@ -50,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Edit Users</title>
+  <title>Add Users</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
