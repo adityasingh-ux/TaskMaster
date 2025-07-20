@@ -2,15 +2,7 @@
 $admin_login = false;
 $showError = false;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $server = "localhost";
-  $username = "root";
-  $password = "";
-  $database = "new_task_manag_db";
-
-  $conn = mysqli_connect($server, $username, $password, $database);
-  if (!$conn) { 
-      die("Error". mysqli_connect_error());
-  }
+  include 'partials/new_dbconnect.php';
 
   $username = $_POST["username"];
   $password = $_POST["password"];
@@ -183,7 +175,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" required>
         </div>
         <button type="submit" class="btn btn-primary w-100">Login</button>
-        <p class="login">Not an admin? <a href="login_page.php">Student Login</a></p>
+        <p class="login">Not an admin? <a href="index.php">Student Login</a></p>
       </form>
     </div>
   </div>

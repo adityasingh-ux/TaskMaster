@@ -3,7 +3,7 @@ session_start();
 include 'partials/new_dbconnect.php';
 
 if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin']!=true){
-    header("location: login_page.php");
+    header("location: index.php");
     exit;
 }
 
@@ -29,11 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
 
 
 $sql = "SELECT * FROM tasks WHERE assigned_to = '$rollno' and `status`!= 'completed' ";
-$result = mysqli_query($conn, $sql);
-$tasks = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $tasks[] = $row;
-}
+$tasks = mysqli_query($conn, $sql);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -118,12 +115,10 @@ while ($row = mysqli_fetch_assoc($result)) {
     <tbody>
 
         <?php
-        $sql = "SELECT * FROM tasks WHERE assigned_to = '$rollno' AND `status`!= 'completed'";
-        $result = mysqli_query($conn, $sql);
         $serial = 1;
 
-        if (mysqli_num_rows($result) > 0) {
-            while ($task = mysqli_fetch_assoc($result)) {
+        if (mysqli_num_rows($tasks) > 0) {
+            while ($task= mysqli_fetch_assoc($tasks)) {
                 echo "<tr>";
                 echo "<td>" . $serial++ . "</td>";
                 echo "<td>" . $task['title'] . "</td>";

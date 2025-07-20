@@ -2,7 +2,7 @@
 session_start();
 include 'partials/new_dbconnect.php';
 if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin']!=true){
-    header("location: login_page.php");
+    header("location: index.php");
     exit;
 }
 ?>

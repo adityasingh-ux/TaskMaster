@@ -3,16 +3,7 @@ $showAlert = false;
 $showError = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $server = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "new_task_manag_db";
-
-    $conn = mysqli_connect($server, $username, $password, $database);
-
-    if (!$conn) {
-        die("Database connection failed: " . mysqli_connect_error());
-    }
+    include 'partials/new_dbconnect.php';
 
     $rollno = $_POST["rollno"];
     $username = $_POST["username"];
@@ -215,7 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
         </div>
         <button type="submit" class="btn btn-primary w-100">Sign Up</button>
-        <p class="login">Already have an account? <a href="login_page.php">Login</a></p>
+        <p class="login">Already have an account? <a href="index.php">Login</a></p>
       </form>
     </div>
   </div>

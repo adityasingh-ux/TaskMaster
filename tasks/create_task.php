@@ -17,12 +17,22 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
     exit;
 }
 
+$deptOptions = '';
+$dept_query = "SELECT DISTINCT `department` from `rollnos`";
+$dept_result = mysqli_query($conn, $dept_query);
+if ($dept_result && mysqli_num_rows($dept_result) > 0) {
+        
+        while ($row = mysqli_fetch_assoc($dept_result)) {
+            $deptOptions .= "<option value='" . $row['department'] . "'>" . $row['department'] . "</option>";
+        }
+    }
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   $title = $_POST["title"];
   $description = $_POST["description"];
   $due_date = $_POST["due_date"];
-
+  $selected_dept = $_POST["departments"] ?? '';
 
   $file_path = '';
   if (isset($_FILES['task_file']) && $_FILES['task_file']['error'] === UPLOAD_ERR_OK) {
@@ -46,8 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       }
   }
 
-
-  $user_query = "SELECT rollno, username, department FROM users";
+  if (!empty($selected_dept)) {
+      $user_query = "SELECT rollno, username, department FROM users WHERE department = '$selected_dept'";
+  } else {
+      $user_query = "SELECT rollno, username, department FROM users";
+  }
   $user_result = mysqli_query($conn, $user_query);
 
   if ($user_result && mysqli_num_rows($user_result) > 0) {
@@ -116,8 +129,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       width: 400px;
-      margin: 30px auto;
-      margin-top: 100px;
+      margin: 0 auto;
+      margin-top: 106px;
     }
     h2 {
       text-align: center;
@@ -132,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     input[type="text"],
     textarea,
-    input[type="date"] {
+    input[type="date"], select {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
@@ -170,11 +183,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div style="font-size: 13px;">
           <?php
           
-            echo '@' . (isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User');
+            echo '@' . (isset($_SESSION['username']) ? $_SESSION['username'] : 'User');
           ?>
         </div>
       </div>
-      <button class="btn-logout" onclick="location.href='../login_page.php'">Logout</button>
+      <button class="btn-logout" onclick="location.href='../index.php'">Logout</button>
     </div>
   </nav>
 
@@ -189,6 +202,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       <label for="due_date">Due Date</label>
       <input type="date" id="due_date" name="due_date">
+
+      <label for="departments">Select Department</label>
+      <select id="departments" name="departments" required>
+          <option value="">-- Select Department --</option>
+          <?= $deptOptions ?>
+      </select>
+
       <label for="task_file">Attach File (PDF, Image):</label>
       <input type="file" id="task_file" name="task_file" accept=".pdf,.jpg,.jpeg,.png,.gif">
       <button type="submit">Add Task</button>

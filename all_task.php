@@ -1,14 +1,5 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "new_task_manag_db";
-
-$conn = mysqli_connect($servername, $username, $password, $database);
-
-if (!$conn) {
-    die("Sorry, we failed to connect: " . mysqli_connect_error());
-}
+include 'partials/new_dbconnect.php';
 
 session_start();
 
@@ -16,6 +7,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
     header("location: admin_login.php");
     exit;
 }
+$search = $_GET['search'] ;
 
 ?>
 <!DOCTYPE html>
@@ -104,7 +96,6 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
         <div style="font-size: 24px; color: #0d6efd;">👤</div>
         <div style="font-size: 13px;">
           <?php
-            
             echo '@' . (isset($_SESSION['username']) ? $_SESSION['username'] : 'User');
           ?>
         </div>
@@ -112,8 +103,19 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
     <button class="btn-logout" onclick="location.href='logout.php'">Logout</button>
   </div>
 </nav>
+<?php
+
+
+?>
+
 <div class="dashboard-container">
     <h2>📋 All Tasks</h2>
+    <form action="all_task.php" method="GET">
+    <div class="input-group mb-3">
+  <input type="text" class="form-control" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>" placeholder="search by name, title, or rollno"  >
+  <button type="submit" class="btn btn-primary">Search</button>
+</div>
+    </form>
     <table class="table" id="myTable">
     <thead>
         <tr>
@@ -125,13 +127,17 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
             <th>Department</th>
             <th>Due Date</th>
             <th>Status</th>
-            <th>File</th> <!-- Added File column -->
+            <th>File</th>
             <th>Action</th>
         </tr>
     </thead>
     <tbody>
     <?php
-    $sql = "SELECT * FROM tasks where `status`!= 'completed'";
+    if ($search != '') {
+        $sql = "SELECT * FROM tasks WHERE (`status` != 'completed') AND (title LIKE '%$search%' OR assigned_to LIKE '%$search%' OR username LIKE '%$search%')";
+    } else {
+        $sql = "SELECT * FROM tasks WHERE `status` != 'completed'";
+    }
     $result = mysqli_query($conn, $sql);
 
     while ($row = mysqli_fetch_assoc($result)) {
@@ -145,7 +151,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
             <td>" . $row['due_date'] . "</td>
             <td>" . $row['status'] . "</td>";
 
-        // File column
+
         echo "<td>";
         if (!empty($row['file_path'])) {
             $fileName = basename($row['file_path']);

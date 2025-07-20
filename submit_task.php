@@ -1,20 +1,11 @@
 <?php
 $alert = FALSE;
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "new_task_manag_db";
-
-$conn = mysqli_connect($servername, $username, $password, $database);
-
-if (!$conn) {
-    die("Sorry, we failed to connect: " . mysqli_connect_error());
-}
+include 'partials/new_dbconnect.php';
 
 session_start();
 
 if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin']!=true){
-    header("location: login_page.php");
+    header("location: index.php");
     exit;
 }
 
@@ -194,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           ?>
         </div>
       </div>
-      <button class="btn-logout" onclick="location.href='login_page.php'">Logout</button>
+      <button class="btn-logout" onclick="location.href='index.php'">Logout</button>
     </div>
   </nav>
   <?php
