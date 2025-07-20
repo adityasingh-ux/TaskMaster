@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 17, 2025 at 09:51 PM
+-- Generation Time: Jul 20, 2025 at 11:18 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -63,7 +63,7 @@ INSERT INTO `rollnos` (`sno`, `rollno`, `department`) VALUES
 (3, 1003, 'information_technology'),
 (4, 1004, 'mechanical'),
 (8, 1005, 'computer_science'),
-(9, 1006, 'civil');
+(9, 1006, 'electronics');
 
 -- --------------------------------------------------------
 
@@ -139,7 +139,7 @@ INSERT INTO `tasks` (`id`, `title`, `description`, `assigned_to`, `username`, `d
 (36, 'New task ', 'pdf checking', 1001, 'Isaac', 'electronics', '2025-07-27', 'in_progress', '2025-07-03 23:34:39', 'uploads/6867138f2e3eb.pdf'),
 (37, 'New task ', 'pdf checking', 1002, 'Harshit', 'electrical', '2025-07-27', 'completed', '2025-07-03 23:34:39', 'uploads/6867138f2e3eb.pdf'),
 (38, 'New task ', 'pdf checking', 1003, 'Ojas', 'information_technology', '2025-07-27', 'pending', '2025-07-03 23:34:39', 'uploads/6867138f2e3eb.pdf'),
-(39, 'New task ', 'pdf checking', 1004, 'Aditya', 'mechanical', '2025-07-27', 'pending', '2025-07-03 23:34:39', 'uploads/6867138f2e3eb.pdf'),
+(39, 'New task ', 'pdf checking', 1004, 'Aditya', 'mechanical', '2025-07-27', 'in_progress', '2025-07-03 23:34:39', 'uploads/6867138f2e3eb.pdf'),
 (45, 'Welcome task', 'Welcome everybody', 1002, 'Harshit', 'electrical', '2025-07-24', 'pending', '2025-07-06 19:35:29', 'uploads/cat.jpg'),
 (46, 'Welcome task', 'Welcome everybody', 1003, 'Ojas', 'information_technology', '2025-07-24', 'pending', '2025-07-06 19:35:29', 'uploads/cat.jpg'),
 (47, 'Welcome task', 'Welcome everybody', 1004, 'Aditya', 'mechanical', '2025-07-24', 'completed', '2025-07-06 19:35:29', 'uploads/cat.jpg'),
@@ -161,7 +161,9 @@ INSERT INTO `tasks` (`id`, `title`, `description`, `assigned_to`, `username`, `d
 (82, 'new check', 'ss', 1002, 'Harshit', 'electrical', '2025-07-04', 'pending', '2025-07-14 18:59:44', ''),
 (83, 'new check', 'ss', 1003, 'Ojas', 'information_technology', '2025-07-04', 'pending', '2025-07-14 18:59:44', ''),
 (84, 'new check', 'ss', 1004, 'Aditya', 'mechanical', '2025-07-04', 'pending', '2025-07-14 18:59:44', ''),
-(85, 'new check', 'ss', 1005, 'Aryan', 'computer_science', '2025-07-04', 'pending', '2025-07-14 18:59:45', '');
+(85, 'new check', 'ss', 1005, 'Aryan', 'computer_science', '2025-07-04', 'pending', '2025-07-14 18:59:45', ''),
+(88, 'Elec task', 'for elec students', 1001, 'Isaac', 'electronics', '2025-07-26', 'pending', '2025-07-19 21:40:48', ''),
+(89, 'Elec task', 'for elec students', 1006, 'Yash', 'electronics', '2025-07-26', 'pending', '2025-07-19 21:40:48', '');
 
 -- --------------------------------------------------------
 
@@ -187,7 +189,8 @@ INSERT INTO `users` (`sno`, `username`, `password`, `department`, `dt`, `rollno`
 (2, 'Harshit', 'harshit', 'electrical', '2025-07-01 23:37:39', 1002),
 (3, 'Ojas', 'ojas', 'information_technology', '2025-07-02 00:22:39', 1003),
 (4, 'Aditya', 'aditya', 'mechanical', '2025-07-02 00:23:11', 1004),
-(22, 'Aryan', 'aryan', 'computer_science', '2025-07-12 03:00:44', 1005);
+(22, 'Aryan', 'aryan', 'computer_science', '2025-07-12 03:00:44', 1005),
+(23, 'Yash', 'yash', 'electronics', '2025-07-20 03:10:11', 1006);
 
 --
 -- Indexes for dumped tables
@@ -249,13 +252,13 @@ ALTER TABLE `submitted_tasks`
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `sno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `sno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
