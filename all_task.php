@@ -7,7 +7,7 @@ if(!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin']!=true){
     header("location: admin_login.php");
     exit;
 }
-$search = $_GET['search'] ;
+$search = isset($_GET['search']) ? $_GET['search'] : '';
 
 ?>
 <!DOCTYPE html>
