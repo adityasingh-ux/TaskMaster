@@ -20,6 +20,53 @@ if (isset($_SESSION['rollno'])) {
         }
     }
 }
+
+$notifications = [];
+
+$q = "SELECT id,title,due_date FROM tasks WHERE assigned_to='$rollno' AND status != 'completed' AND due_date < CURDATE()";
+$r = mysqli_query($conn, $q);
+while ($row = mysqli_fetch_assoc($r)) {
+    $notifications[] = [
+        'type' => 'missed',
+        'id' => $row['id'],
+        'title' => $row['title'],
+        'date' => date('Y-m-d', strtotime($row['due_date']))
+    ];
+}
+
+$q = "SELECT id,title,due_date FROM tasks WHERE assigned_to='$rollno' AND status != 'completed' AND due_date = DATE_ADD(CURDATE(), INTERVAL 1 DAY)";
+$r = mysqli_query($conn, $q);
+while ($row = mysqli_fetch_assoc($r)) {
+    $notifications[] = [
+        'type' => 'due_soon',
+        'id' => $row['id'],
+        'title' => $row['title'],
+        'date' => date('Y-m-d', strtotime($row['due_date']))
+    ];
+}
+
+$createdCol = '';
+$colRes = mysqli_query($conn, "SHOW COLUMNS FROM tasks LIKE 'dt'");
+if ($colRes && mysqli_num_rows($colRes) > 0) $createdCol = 'dt';
+else {
+    $colRes = mysqli_query($conn, "SHOW COLUMNS FROM tasks LIKE 'created_at'");
+    if ($colRes && mysqli_num_rows($colRes) > 0) $createdCol = 'created_at';
+}
+if ($createdCol) {
+    $q = "SELECT id,title,due_date FROM tasks WHERE assigned_to='$rollno' AND DATE($createdCol) = CURDATE()";
+    $r = mysqli_query($conn, $q);
+    while ($row = mysqli_fetch_assoc($r)) {
+        $notifications[] = [
+            'type' => 'new',
+            'id' => $row['id'],
+            'title' => $row['title'],
+            'date' => date('Y-m-d', strtotime($row['due_date']))
+        ];
+    }
+}
+
+$notifications = array_reverse($notifications);
+$notifCount = count($notifications);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -183,12 +230,54 @@ if (isset($_SESSION['rollno'])) {
       .calendar-box { max-width:100%; margin-right:0;}
       .right-panel { padding: 30px 10px; }
     }
+    .notif-btn { position: relative; border-radius: 50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; }
+    .notif-badge { position: absolute; top: 4px; right: 4px; font-size: 0.65rem; padding: 3px 6px; border-radius: 999px; }
+    .notif-item-missed { background:#ffecec; }
+    .notif-item-due { background:#fff7e6; }
+    .notif-item-new { background:#e9f7ee; }
+    .notif-list { max-height: 320px; overflow:auto; }
   </style>
 </head>
 <body>
 <nav class="navbar navbar-custom d-flex justify-content-between align-items-center">
   <span class="navbar-brand">Student Task Manager</span>
   <div class="d-flex align-items-center gap-3">
+        <div class="dropdown">
+      <button class="btn btn-light notif-btn" id="notifToggle" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+        🔔
+        <?php if ($notifCount > 0): ?>
+          <span class="badge bg-danger notif-badge"><?php echo $notifCount; ?></span>
+        <?php endif; ?>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width:320px;">
+        <li class="dropdown-header">Notifications <?php if($notifCount>0) echo "($notifCount)"; ?></li>
+        <li><hr class="dropdown-divider"></li>
+        <div class="notif-list">
+        <?php if ($notifCount == 0): ?>
+            <li class="px-3 py-2 text-muted">No notifications</li>
+        <?php else: ?>
+            <?php foreach ($notifications as $n): ?>
+              <?php
+                $label = '';
+                $cls = '';
+                if ($n['type'] === 'missed') { $label = 'Missed'; $cls='notif-item-missed'; }
+                elseif ($n['type'] === 'due_soon') { $label = 'Due tomorrow'; $cls='notif-item-due'; }
+                else { $label = 'New task'; $cls='notif-item-new'; }
+                $link = "my_tasks.php?task_id=" . $n['id'];
+              ?>
+              <li class="px-2 py-2 <?php echo $cls; ?>">
+                <a class="text-decoration-none d-block" href="<?php echo $link; ?>">
+                  <strong><?php echo $n['title']; ?></strong>
+                  <div class="text-muted" style="font-size:0.85rem;"><?php echo $label . ' — ' . $n['date']; ?></div>
+                </a>
+              </li>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        </div>
+        <li><hr class="dropdown-divider"></li>
+        <li class="px-3"><a href="my_tasks.php" class="btn btn-sm btn-outline-primary w-100">View all tasks</a></li>
+      </ul>
+    </div>
     <div class="text-center">
       <div style="font-size: 24px; color: #0d6efd;">👤</div>
       <div style="font-size: 13px;">@<?= isset($_SESSION['username']) ? $_SESSION['username'] : 'User' ?></div>
@@ -242,7 +331,6 @@ let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
 const deadlineDates = <?= json_encode($allDates) ?>;
 
-// Return highlight class by status (pending, in_progress, completed)
 function getStatusClass(dateStr) {
   for (const obj of deadlineDates) {
     if (obj.date === dateStr) {
@@ -254,7 +342,6 @@ function getStatusClass(dateStr) {
   return "";
 }
 
-// Main calendar render function - used for both modal and mini
 function renderCalendar(month, year, gridId, titleId = null) {
   const grid = document.getElementById(gridId);
   const title = titleId ? document.getElementById(titleId) : null;
@@ -296,7 +383,6 @@ function changeMonthInModal(offset) {
   renderCalendar(currentMonth, currentYear, "calendarMini", "miniCalendarMonth");
 }
 
-// Initial render
 renderCalendar(currentMonth, currentYear, "calendarMini", "miniCalendarMonth");
 document.getElementById("calendarModal").addEventListener("shown.bs.modal", () => {
   renderCalendar(currentMonth, currentYear, "calendarFull", "calendarMonth");
